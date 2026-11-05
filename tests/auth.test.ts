@@ -1,10 +1,6 @@
-import { PGlite } from "@electric-sql/pglite";
 import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/pglite";
-import { migrate } from "drizzle-orm/pglite/migrator";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { Db } from "../src/db/client";
-import * as schema from "../src/db/schema";
 import { auditLog, sessions, users } from "../src/db/schema";
 import {
   changePassword,
@@ -22,6 +18,7 @@ import {
 } from "../src/server/auth-service";
 import { requireCsrf } from "../src/server/http";
 import { hashPassword } from "../src/lib/auth";
+import { createTestDatabase, type TestDatabase } from "./helpers/db";
 
 process.env.BCRYPT_ROUNDS = "4";
 
@@ -29,24 +26,20 @@ const META = { ip: "127.0.0.1", userAgent: "vitest" };
 const PASSWORD = "correct horse battery 1";
 const EMAIL = "owner@example.com";
 
-let client: PGlite;
+let database: TestDatabase;
 let db: Db;
 
 beforeAll(async () => {
-  client = new PGlite();
-  const pglite = drizzle(client, { schema });
-  await migrate(pglite, { migrationsFolder: "./drizzle" });
-  db = pglite as unknown as Db;
+  database = await createTestDatabase();
+  db = database.db;
 });
 
 beforeEach(async () => {
-  await client.exec(
-    "truncate table users, sessions, login_history, password_resets, audit_log restart identity cascade",
-  );
+  await database.reset();
 });
 
 afterAll(async () => {
-  await client.close();
+  await database.close();
 });
 
 async function makeOwner(): Promise<number> {
