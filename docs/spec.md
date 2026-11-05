@@ -241,6 +241,10 @@ Rules:
 - Errors are `{ "error": "..." }`; `422` for validation, `409` for conflicts/locks, `401/403` for access.
 - Exports and attachment downloads stream bytes with `Content-Disposition`; the bucket is never
   exposed to the browser.
+- Masters: rates are integer basis points and unique. HSN/SAC codes are 4, 6 or 8 digits; their
+  default rate must already exist in `tax_rates`. A party's state comes from its GSTIN, otherwise
+  from the business state. The owner alone changes the business row and tax rates; any signed-in
+  user may maintain HSN codes and parties. Every change is audited.
 
 ## 10. Screens and UI rules
 

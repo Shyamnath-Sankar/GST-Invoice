@@ -100,3 +100,167 @@ a:focus-visible {
 .error {
   color: #a40000;
 }
+
+.ok {
+  color: #0a6b0a;
+}
+
+.muted {
+  color: #555555;
+}
+
+.small {
+  font-size: 0.875rem;
+}
+
+.narrow {
+  max-width: 26rem;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #cccccc;
+  background: #fafafa;
+}
+
+.brand {
+  font-weight: 600;
+}
+
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.nav a {
+  text-decoration: none;
+}
+
+.nav a:hover {
+  text-decoration: underline;
+}
+
+.sheet {
+  margin: 1rem 0;
+  border: 1px solid #cccccc;
+  background: #ffffff;
+}
+
+.sheet-pad {
+  padding: 1rem;
+}
+
+.sheet-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #cccccc;
+  background: #fafafa;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+}
+
+.span-2 {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.field > label:first-child {
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.grow {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: normal;
+}
+
+.plain-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 1rem 0;
+}
+
+.tabs button {
+  background: #ffffff;
+}
+
+.tabs button[aria-selected="true"] {
+  background: #eeeeee;
+  font-weight: 600;
+  border-color: #555555;
+}
+
+button.quiet {
+  background: #ffffff;
+}
+
+.link-button {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: #0645ad;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .span-2 {
+    grid-column: auto;
+  }
+
+  .topbar {
+    padding: 0.75rem 1rem;
+  }
+}
+
