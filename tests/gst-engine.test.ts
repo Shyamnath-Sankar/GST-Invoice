@@ -117,6 +117,53 @@ describe("calcLine", () => {
     expect(result.totalPaise).toBe(50000);
   });
 
+  it("turns a taxable line into a zero-rated export", () => {
+    const result = calcLine(
+      { qty: 1, unitPricePaise: 100000, gstRateBp: 1800 },
+      { inclusive: false, interState: true, isExport: true },
+    );
+    expect(result.supplyKind).toBe("zero_rated");
+    expect(result.gstRateBp).toBe(0);
+    expect(result.taxableValuePaise).toBe(100000);
+    expect(result.igstPaise).toBe(0);
+    expect(result.totalPaise).toBe(100000);
+  });
+
+  it("charges IGST on an export when export with IGST is set", () => {
+    const result = calcLine(
+      { qty: 1, unitPricePaise: 100000, gstRateBp: 1800 },
+      { inclusive: false, interState: true, isExport: true, exportWithIgst: true },
+    );
+    expect(result.supplyKind).toBe("zero_rated");
+    expect(result.gstRateBp).toBe(1800);
+    expect(result.igstPaise).toBe(18000);
+    expect(result.totalPaise).toBe(118000);
+  });
+
+  it("forces a zero-rated supply to a zero rate unless it is an export with IGST", () => {
+    const domestic = calcLine(
+      { qty: 1, unitPricePaise: 100000, gstRateBp: 1800, supplyKind: "zero_rated" },
+      { inclusive: false, interState: true },
+    );
+    expect(domestic.gstRateBp).toBe(0);
+    expect(domestic.totalPaise).toBe(100000);
+  });
+
+  it("rejects a non-positive quantity and a negative rate", () => {
+    expect(() =>
+      calcLine(
+        { qty: 0, unitPricePaise: 10000, gstRateBp: 500 },
+        { inclusive: false, interState: false },
+      ),
+    ).toThrow();
+    expect(() =>
+      calcLine(
+        { qty: 1, unitPricePaise: -1, gstRateBp: 500 },
+        { inclusive: false, interState: false },
+      ),
+    ).toThrow();
+  });
+
   it("rounds each tax component half-up to the paisa", () => {
     const lower = calcLine(
       { qty: 1, unitPricePaise: 1010, gstRateBp: 500 },
@@ -240,6 +287,24 @@ describe("calcDocument", () => {
       exempt: 30000,
     });
     expect(document.byRate).toHaveLength(1);
+  });
+  it("keeps an export line in the zero-rated kind bucket", () => {
+    const document = calcDocument(
+      [{ qty: 1, unitPricePaise: 100000, gstRateBp: 1800 }],
+      { inclusive: false, interState: true, isExport: true },
+    );
+    expect(document.byKind).toEqual({ zero_rated: 100000 });
+    expect(document.byRate).toEqual([
+      {
+        gstRateBp: 0,
+        taxableValuePaise: 100000,
+        cgstPaise: 0,
+        sgstPaise: 0,
+        igstPaise: 0,
+        cessPaise: 0,
+      },
+    ]);
+    expect(document.igstPaise).toBe(0);
   });
 });
 

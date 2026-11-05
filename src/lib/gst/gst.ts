@@ -29,6 +29,9 @@ export const GSTR1_SECTIONS = [
 
 export type Gstr1Section = (typeof GSTR1_SECTIONS)[number];
 
+/** B2CL threshold: invoice value above ₹1,00,000 (inter-state, unregistered). */
+export const DEFAULT_B2CL_LIMIT_PAISE = 10_000_000;
+
 export interface LineInput {
   qty: number;
   unitPricePaise: number;
@@ -45,6 +48,7 @@ export interface LineResult {
   grossPaise: number;
   discountPaise: number;
   taxableValuePaise: number;
+  supplyKind: SupplyKind;
   gstRateBp: number;
   cgstPaise: number;
   sgstPaise: number;
@@ -52,6 +56,13 @@ export interface LineResult {
   cessPaise: number;
   taxPaise: number;
   totalPaise: number;
+}
+
+export interface CalcOptions {
+  inclusive: boolean;
+  interState: boolean;
+  isExport?: boolean;
+  exportWithIgst?: boolean;
 }
 
 export interface RateBucket {
@@ -95,13 +106,13 @@ function splitTax(
   return { cgstPaise: half, sgstPaise: half, igstPaise: 0 };
 }
 
-export function calcLine(
-  line: LineInput,
-  options: { inclusive: boolean; interState: boolean },
-): LineResult {
-  const kind = line.supplyKind ?? "taxable";
+export function calcLine(line: LineInput, options: CalcOptions): LineResult {
+  let kind = line.supplyKind ?? "taxable";
   if (!SUPPLY_KINDS.includes(kind)) {
     throw new Error(`Unknown supply kind ${String(kind)}`);
+  }
+  if (!Number.isFinite(line.qty) || line.qty <= 0) {
+    throw new Error("Quantity must be more than zero");
   }
   if (!Number.isFinite(line.unitPricePaise)) {
     throw new Error("Unit price must be a finite number");
@@ -109,13 +120,26 @@ export function calcLine(
   if (!Number.isInteger(line.unitPricePaise)) {
     throw new Error("Unit price must be integer paise");
   }
+  if (line.unitPricePaise < 0) {
+    throw new Error("Rate cannot be negative");
+  }
+
+  // An export turns a taxable line into a zero-rated supply.
+  if (options.isExport && kind === "taxable") {
+    kind = "zero_rated";
+  }
 
   const nonTaxable = NON_TAXABLE_KINDS.includes(kind);
-  const rateBp = nonTaxable ? 0 : line.gstRateBp;
+  const exportedWithoutIgst = Boolean(options.isExport) && !options.exportWithIgst;
+  const zeroRatedWithoutIgst =
+    kind === "zero_rated" && !(options.isExport && options.exportWithIgst);
+  const noRate = nonTaxable || exportedWithoutIgst || zeroRatedWithoutIgst;
+
+  const rateBp = noRate ? 0 : line.gstRateBp;
   if (!Number.isInteger(rateBp) || rateBp < 0 || rateBp > BP_SCALE) {
     throw new Error("GST rate must be between 0 and 100");
   }
-  const cessRateBp = nonTaxable ? 0 : (line.cessRateBp ?? 0);
+  const cessRateBp = noRate ? 0 : (line.cessRateBp ?? 0);
   if (!Number.isInteger(cessRateBp) || cessRateBp < 0 || cessRateBp > BP_SCALE) {
     throw new Error("Cess rate must be between 0 and 100");
   }
@@ -164,6 +188,7 @@ export function calcLine(
     grossPaise,
     discountPaise,
     taxableValuePaise,
+    supplyKind: kind,
     gstRateBp: rateBp,
     cgstPaise,
     sgstPaise,
@@ -176,11 +201,9 @@ export function calcLine(
 
 export function calcDocument(
   lines: readonly LineInput[],
-  options: { inclusive: boolean; interState: boolean; roundOff?: boolean },
+  options: CalcOptions & { roundOff?: boolean },
 ): DocumentResult {
-  const results = lines.map((line) =>
-    calcLine(line, { inclusive: options.inclusive, interState: options.interState }),
-  );
+  const results = lines.map((line) => calcLine(line, options));
 
   const buckets = new Map<number, RateBucket>();
   const byKind: Partial<Record<SupplyKind, number>> = {};
@@ -190,12 +213,8 @@ export function calcDocument(
   let igstPaise = 0;
   let cessPaise = 0;
 
-  lines.forEach((input, index) => {
-    const result = results[index];
-    if (!result) {
-      return;
-    }
-    const kind = input.supplyKind ?? "taxable";
+  results.forEach((result) => {
+    const kind = result.supplyKind;
     taxableValuePaise += result.taxableValuePaise;
     cgstPaise += result.cgstPaise;
     sgstPaise += result.sgstPaise;
