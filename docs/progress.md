@@ -7,8 +7,8 @@ Tracks `docs/plan.md`. Each phase ends with a commit and green gates:
 |---|---|
 | 0 — Repository and skeleton | done |
 | 1 — Money, GSTIN, periods | done |
-| 2 — GST engine | in progress |
-| 3 — Database and auth | pending |
+| 2 — GST engine | done |
+| 3 — Database and auth | in progress |
 | 4 — Masters and settings | pending |
 | 5 — Sales and purchases (with attachments) | pending |
 | 6 — Returns | pending |

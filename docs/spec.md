@@ -111,7 +111,7 @@ All tables have `created_at`/`updated_at` where the old model did. IDs are `bigs
 | `hsn_codes` | code unique, description, is_service, default_rate_bp, supply_kind, uqc, itc_allowed, notes, active |
 | `parties` | kind (`customer`/`supplier`), name, gstin, address, state_code, phone, email, active; unique (kind, name, gstin) |
 | `sales_docs` | doc_type, number, date, party fields, place_of_supply, reverse_charge, price_mode, totals, round_off, notes, status, original_number/date, note_reason, is_export, export_with_igst, section, amends_id, amended_by_id, amend_period, order_ref, import_batch_id; unique (doc_type, number) |
-| `sales_lines` | doc_id, position, description, hsn_sac, qty, unit, unit_price, discount, gst_rate_bp, cess_rate_bp, supply_kind, taxable_value, cgst, sgst, igst, cess, total |
+| `sales_lines` | doc_id, position, description, hsn_sac, qty, unit, unit_price_paise, discount_paise, gst_rate_bp, cess_rate_bp, supply_kind, taxable_value_paise, cgst_paise, sgst_paise, igst_paise, cess_paise, total_paise |
 | `purchases` | same document fields plus supplier fields, category, itc_period, recon_status; unique (supplier_gstin, supplier_name, number, doc_type) |
 | `purchase_lines` | line fields plus itc_eligible, itc_reason |
 | `itc_adjustments` | period, kind (`reversal`/`reclaim`), rule, igst/cgst/sgst/cess, note |
@@ -121,8 +121,8 @@ All tables have `created_at`/`updated_at` where the old model did. IDs are `bigs
 | `documents` | entity_type (`sale`/`purchase`/`return`/`party`), entity_id, kind (`bill_photo`/`supplier_pdf`/`acknowledgement`/`other`), filename, mime_type, size_bytes, object_key unique, checksum, uploaded_by, created_at |
 
 `qty` is stored as `numeric(14,3)` (fractional quantities are real, e.g. 2.5 kg).
-`unit_price` is `numeric(14,4)` (rate per unit). Both are converted to paise inside the engine
-with documented rounding.
+`unit_price_paise` is a `bigint` money column: the rate per unit in integer paise. Everything the
+engine consumes is integer paise, so no sub-paisa unit rate is stored.
 
 Indexes: dates, periods, doc numbers, party GSTIN, audit time, session token,
 `documents (entity_type, entity_id)`, `documents object_key`.
