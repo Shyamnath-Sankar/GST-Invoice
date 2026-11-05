@@ -11,8 +11,7 @@ is usable.
 **Goal:** an empty Next.js app that builds on Vercel.
 
 - `package.json` with Next.js, React, TypeScript, Drizzle, `postgres`, `zod`, `bcryptjs`,
-  `pdfkit`, `exceljs`, `csv-parse`, `fflate`, `@aws-sdk/client-s3`,
-  `@aws-sdk/s3-request-presigner`, Vitest, PGlite, ESLint.
+  `pdfkit`, `exceljs`, `csv-parse`, `fflate`, `@aws-sdk/client-s3`, Vitest, PGlite, ESLint.
 - `next.config.ts`, `tsconfig.json` (strict), `.eslintrc`, `vitest.config.ts`, `drizzle.config.ts`.
 - `src/app/layout.tsx`, `globals.css`, a placeholder home page.
 - `src/db/client.ts` (`postgres` + Drizzle, singleton in dev), `src/db/schema.ts` stub.
