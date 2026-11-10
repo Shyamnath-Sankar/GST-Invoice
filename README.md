@@ -4,7 +4,11 @@ GST accounting for Dev Caters, Trichy — rebuilt as a single Next.js applicatio
 
 Record sales and purchase bills, check input tax credit against GSTR-2B, prepare GSTR-1 and GSTR-3B every month, and print or download the papers as PDF, Excel, CSV or JSON.
 
-> **Status: planning.** This repository currently contains the specification and implementation plan. Application code lands only after the spec and plan are approved.
+> **Documentation & User Guide:** For a complete walkthrough on using the application, see the [User Manual](docs/USER_MANUAL.md).
+>
+> Default admin credentials for local development & review:
+> - **Email:** `login@genrecai.com`
+> - **Password:** `genrecai`
 
 ## What it is
 
