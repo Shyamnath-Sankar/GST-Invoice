@@ -136,6 +136,27 @@ export async function createParty(db: Db, actor: Actor, input: PartyInput): Prom
   return created;
 }
 
+/** Return the matching party, creating and auditing it when the bill names a new one. */
+export async function findOrCreateParty(
+  db: Db,
+  actor: Actor,
+  input: PartyInput,
+): Promise<PartyRow> {
+  const name = text(input.name);
+  const gstin = normaliseGstin(input.gstin);
+  const [existing] = await db
+    .select()
+    .from(parties)
+    .where(
+      and(eq(parties.kind, input.kind), eq(parties.name, name), eq(parties.gstin, gstin)),
+    )
+    .limit(1);
+  if (existing) {
+    return existing;
+  }
+  return createParty(db, actor, { ...input, name, gstin });
+}
+
 export async function updateParty(
   db: Db,
   actor: Actor,

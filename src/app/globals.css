@@ -241,6 +241,25 @@ button.quiet {
   background: #ffffff;
 }
 
+.editor-lines th,
+.editor-lines td {
+  padding: 0.2rem;
+}
+
+.editor-lines input,
+.editor-lines select {
+  width: 100%;
+  padding: 0.2rem 0.25rem;
+}
+
+.editor-lines td:first-child {
+  min-width: 10rem;
+}
+
+.editor-lines td .link-button {
+  white-space: nowrap;
+}
+
 .link-button {
   border: 0;
   padding: 0;

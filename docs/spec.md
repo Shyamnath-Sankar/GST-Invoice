@@ -349,6 +349,9 @@ Generated PDFs and reports are not written to the bucket. Only user-supplied att
 - **Integration:** API flows with PGlite — setup/login, create sale, lock, amendment, cancel,
   import preview/commit/rollback, role checks, export content types, document upload/list/delete
   against a stubbed storage client.
+- **Real Neon smoke:** `scripts/check-docs.ts` creates a sale and a purchase, renders an invoice
+  PDF and uploads/downloads/deletes an attachment against Neon Object Storage, then rolls the
+  database transaction back.
 - Fixtures: a business in Tamil Nadu (33), a B2B customer, a B2C customer, a supplier, a 2B file,
   a one-page PDF and a small JPEG.
 - Target: every old Python test has a TypeScript equivalent, plus tests for the four defects in

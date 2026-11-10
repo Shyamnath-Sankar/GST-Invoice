@@ -24,6 +24,8 @@ export default async function AppLayout({
         <span className="brand">{name}</span>
         <nav className="nav" aria-label="Main">
           <Link href="/">This month</Link>
+          <Link href="/sales">Sales</Link>
+          <Link href="/purchases">Purchases</Link>
           <Link href="/parties">Parties</Link>
           <Link href="/settings">Settings</Link>
         </nav>
